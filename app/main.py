@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.lifespan import create_data_dir
+
 # from app.api.v1.api import router_api_v1
 # from app.web.web_router import router_web
 # from app.middleware.logging import LoggingMiddleware
@@ -13,6 +15,7 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print('START APP')
+    create_data_dir()
 
     yield
 
