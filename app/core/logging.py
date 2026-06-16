@@ -44,19 +44,22 @@ class Metrics:
         self.last_error: str | None = None
         self.last_error_time: datetime | None = None
         self.count_error = 0
+        self.has_test = False
     
     def log_error(self, message: str, error: Exception, has_print=True, has_write=True):
         self.last_error = str(error)
         self.last_error_time = datetime.now()
         self.count_error += 1
         
-        if has_print:
-            logger.error(f'{message} - {error}')
-        if has_write:
-            logger.error(traceback.format_exc())
+        if not self.has_test:
+            if has_print:
+                logger.error(f'{message} - {error}')
+            if has_write:
+                logger.error(traceback.format_exc())
 
     def log_info(self, message: str):
-        logger.info(message)
+        if not self.has_test:
+            logger.info(message)
 
     def get_statistics(self) -> dict:
         return {

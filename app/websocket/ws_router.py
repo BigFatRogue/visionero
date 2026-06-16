@@ -6,6 +6,7 @@ from app.core.logging import metrics
 
 from app.core.file_writer import async_file_writer
 
+
 from app.websocket.connection_manager import connection_manager
 
 
@@ -20,15 +21,16 @@ async def source(websocket: WebSocket) -> None:
     while retry < max_retry:
         try:
             await connection_manager.connect_source(websocket)
+            
             metrics.log_info('websocket source connect')
-
+            
             while True:
                 data = await websocket.receive_text()
                 processed = process_data(data)
                 message_json = processed.to_json()
-                
+
                 if message_json is not None:
-                    await connection_manager._broadcast_to_frontend(message_json)
+                    await connection_manager.broadcast_to_frontend(message_json)
                     await async_file_writer.write(message_json)
 
         except WebSocketDisconnect:
@@ -37,7 +39,7 @@ async def source(websocket: WebSocket) -> None:
             break
         except Exception as e:
             retry += 1
-            metrics.log_error(f'websocket source error: {e}')
+            metrics.log_error(f'websocket source error', e)
             await asyncio.sleep(1)
 
 
@@ -60,5 +62,5 @@ async def frontend(websocket: WebSocket) -> None:
             break
         except Exception as e:
             retry += 1
-            metrics.log_error(f'websocket frontend error: {e}')
+            metrics.log_error(f'websocket frontend error', e)
             await asyncio.sleep(1)

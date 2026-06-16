@@ -13,7 +13,7 @@ class AsyncFileWriter:
         self.file_path: Path = Path(settings.DATA_FILEPATH)
         self.flush_interval = settings.FLUSH_INTERVAL
 
-        self.queue: asyncio.Queue = asyncio.Queue()
+        self.queue: asyncio.Queue | None = None
         self._task: asyncio.Task | None = None
         self._running = False
 
@@ -22,17 +22,22 @@ class AsyncFileWriter:
         self.count_write_message = 0
         
     async def start(self):
+        if self._running: return
+
         metrics.log_info(f'start {self.__class__.__name__}')
+        self.queue = asyncio.Queue()
         self._running = True
         self._task = asyncio.create_task(self._writer_loop())
         
     async def stop(self):
         metrics.log_info(f'stop {self.__class__.__name__}')
         self._running = False
+
         if self._task and not self.queue.empty():
             await self._task
+        self.queue = None
         
-    async def write(self, message: dict) -> None:
+    async def write(self, message: str) -> None:
         await self.queue.put(message)
     
     async def _writer_loop(self):
@@ -47,9 +52,10 @@ class AsyncFileWriter:
                     current_time = asyncio.get_event_loop().time()
 
                     message = await asyncio.wait_for(self.queue.get(), timeout=self.flush_interval)
-                    self.buffer.append(json.dumps(message))
+                    self.buffer.append(message)
                     
                     if len(self.buffer) >= settings.FLUSH_COUNT or (current_time - last_flush) >= self.flush_interval:
+                        
                         await self._flush_buffer(self.buffer)
                         self.buffer.clear()
                         last_flush = current_time

@@ -32,7 +32,7 @@ class ProcesData:
             self.source_data = None
             self.procesed_data = None
             self.invalid_message += 1
-            metrics.log_error('validate error', e, False, False)
+            metrics.log_error('validate error', e.errors(), False, False)
             return self
 
         moving_average = self._calc_averge(self.source_data.sensor_id, self.source_data.value)
@@ -45,7 +45,8 @@ class ProcesData:
             'processing_latency_ms': 0
         }
 
-        proces_data_dict = self.source_data.model_dump() + update_data
+        proces_data_dict = self.source_data.model_dump()
+        proces_data_dict.update(update_data)
 
         self.procesed_data = ProcesedDataSheme.model_validate(proces_data_dict)
         

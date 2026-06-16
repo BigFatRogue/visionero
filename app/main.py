@@ -17,7 +17,7 @@ from app.websocket.connection_manager import connection_manager
 
 from app.core.templates import templates
 
-from app.router.system import router_servise
+from app.router.router_system import router_servise
 from app.web.web_router import web_router
 
 
@@ -38,26 +38,32 @@ async def lifespan(app: FastAPI):
 
 origins = ['*']
 
-app = FastAPI(
-    lifespan=lifespan
-    # docs_url=None,
-    # redoc_url=None,
-    # openapi_url=None
-)
 
-app.mount("/web/static", StaticFiles(directory=Path(__file__).parent / "web/static"), name="static")
-app.state.templates = templates
+def create_app() -> FastAPI:
+    app = FastAPI(
+        lifespan=lifespan
+        # docs_url=None,
+        # redoc_url=None,
+        # openapi_url=None
+    )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    app.mount("/web/static", StaticFiles(directory=Path(__file__).parent / "web/static"), name="static")
+    app.state.templates = templates
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
-app.include_router(web_router)
-app.include_router(router_servise)
-app.include_router(ws_router)
+    app.include_router(web_router)
+    app.include_router(router_servise)
+    app.include_router(ws_router)
+
+    return app
+
+app = create_app()
 

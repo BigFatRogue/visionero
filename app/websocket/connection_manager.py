@@ -9,22 +9,27 @@ class ConnectionManager:
         self.source_connection: WebSocket | None = None
         self.frontend_connections: set[WebSocket] = set()
 
-        self.queue: asyncio.Queue[str] = asyncio.Queue()
+        self.queue: asyncio.Queue[str] =  None
         self._task: asyncio.Task | None = None
         self._running = False
 
         self.count_send_message = 0
     
     async def start(self):
+        if self._running: return
+        
         metrics.log_info(f'start {self.__class__.__name__}')
         self._running = True
+        self.queue = asyncio.Queue()
         self._task = asyncio.create_task(self._broadcast_loop())
         
     async def stop(self):
         metrics.log_info(f'stop {self.__class__.__name__}')
         self._running = False
+
         if self._task and not self.queue.empty():
             await self._task
+        self.queue = None
 
     async def connect_source(self, websocket: WebSocket):
         await websocket.accept()
@@ -70,7 +75,8 @@ class ConnectionManager:
         return {
             'count_send_message': self.count_send_message,
             'count_connection_frontend': len(self.frontend_connections),
-            'count_message_wait_send': self.queue.qsize()
+            'count_message_wait_send': self.queue.qsize() if self.queue is not None else 0
         }
+
 
 connection_manager = ConnectionManager()
