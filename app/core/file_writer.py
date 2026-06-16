@@ -47,7 +47,7 @@ class AsyncFileWriter:
         last_flush = asyncio.get_event_loop().time()
         
         try:
-            while self._running or not self.queue.empty():
+            while self._running or (self.queue and not self.queue.empty()):
                 try:
                     current_time = asyncio.get_event_loop().time()
 

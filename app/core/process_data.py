@@ -8,7 +8,7 @@ from app.core.config import settings
 
 from app.core.logging import metrics
 
-from app.schemes.scheme_data import SourceDataSheme, ProcesedDataSheme
+from app.schemas.scheme_data import SourceDataSheme, ProcesedDataSheme
 
 
 class ProcesData:

@@ -49,7 +49,7 @@ class ConnectionManager:
         await self.queue.put(message)
 
     async def _broadcast_loop(self):
-        while self._running or not self.queue.empty():
+        while self._running or (self.queue and not self.queue.empty()):
             try:
                 message = await asyncio.wait_for(self.queue.get(), timeout=0.1)
                 await self._broadcast_to_frontend(message)

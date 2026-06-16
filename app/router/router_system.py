@@ -8,7 +8,7 @@ from app.core.logging import metrics
 
 from app.websocket.connection_manager import connection_manager
 
-from app.schemes.scheme_data import StatisticDataScheme, HealthCheckSystemSheme
+from app.schemas.scheme_data import StatisticDataScheme, HealthCheckSystemSheme
 
 router_servise = APIRouter(prefix='/system', tags=['system'])
 
