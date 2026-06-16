@@ -25,6 +25,9 @@ class StatisticDataScheme(BaseModel):
     count_send_message: int
     count_connection_frontend: int
     count_message_wait_send: int
+    last_error: str | None
+    count_error: int | None
+    last_error_time: datetime | None
 
 
 class HealthCheckSystemSheme(BaseModel):

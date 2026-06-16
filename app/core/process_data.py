@@ -1,10 +1,12 @@
 from typing import Self
 import json
-from datetime import datetime, UTC, timedelta
+from datetime import datetime, UTC
 from collections import deque
 from pydantic import ValidationError
 
 from app.core.config import settings
+
+from app.core.logging import metrics
 
 from app.schemes.scheme_data import SourceDataSheme, ProcesedDataSheme
 
@@ -26,26 +28,26 @@ class ProcesData:
 
         try:
             self.source_data = SourceDataSheme.model_validate_json(data)
-        except ValidationError as ve:
+        except ValidationError as e:
             self.source_data = None
             self.procesed_data = None
             self.invalid_message += 1
+            metrics.log_error('validate error', e, False, False)
             return self
 
-        avg = self._calc_averge(self.source_data.sensor_id, self.source_data.value)
+        moving_average = self._calc_averge(self.source_data.sensor_id, self.source_data.value)
         processed_at = datetime.now(UTC)
 
         update_data = {
-            'moving_average': avg,
+            'moving_average': moving_average,
             'received_at': received_at.isoformat(timespec='milliseconds'),
             'processed_at': processed_at.isoformat(timespec='milliseconds'),
             'processing_latency_ms': 0
         }
 
-        data = self.source_data.model_dump()
-        data.update(update_data)
+        proces_data_dict = self.source_data.model_dump() + update_data
 
-        self.procesed_data = ProcesedDataSheme.model_validate(data)
+        self.procesed_data = ProcesedDataSheme.model_validate(proces_data_dict)
         
         self.procesed_message += 1
         
@@ -82,6 +84,6 @@ class ProcesData:
         return f'{self.count_message=}, {self.procesed_message=}, {self.invalid_message=}, {self.avg_processing_latency_ms=}'
 
     def __repr__(self) -> str:
-        return self.__str__
+        return self.__str__()
 
 process_data = ProcesData()

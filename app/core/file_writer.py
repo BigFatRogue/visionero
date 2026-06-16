@@ -5,6 +5,8 @@ from pathlib import Path
 
 from app.core.config import settings
 
+from app.core.logging import metrics
+
 
 class AsyncFileWriter:
     def __init__(self):
@@ -20,12 +22,14 @@ class AsyncFileWriter:
         self.count_write_message = 0
         
     async def start(self):
+        metrics.log_info(f'start {self.__class__.__name__}')
         self._running = True
         self._task = asyncio.create_task(self._writer_loop())
         
     async def stop(self):
+        metrics.log_info(f'stop {self.__class__.__name__}')
         self._running = False
-        if self._task:
+        if self._task and not self.queue.empty():
             await self._task
         
     async def write(self, message: dict) -> None:
@@ -57,12 +61,15 @@ class AsyncFileWriter:
                         last_flush = asyncio.get_event_loop().time()
                         
         except Exception as e:
-            print(f"File writer error: {e}")
+            metrics.log_error("File writer error", e)
     
     async def _flush_buffer(self, buffer: list[str]):
+        self.file_path.parent.mkdir(parents=True, exist_ok=True)
+        
         async with aiofiles.open(self.file_path, 'a') as f:
             await f.write('\n'.join(buffer) + '\n')
         self.count_write_message += len(buffer)
+        metrics.log_info('success write file')
 
     def get_statistics(self) -> dict:
         return {

@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
    
+from app.core.logging import logger
+
     
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
@@ -9,5 +11,4 @@ class Settings(BaseSettings):
     FLUSH_INTERVAL: int
     FLUSH_COUNT: int
     
-
 settings = Settings()

@@ -1,5 +1,7 @@
 from app.core.config import settings
+from app.core.logging import logger
 from pathlib import Path
+
 
 
 def create_data_dir() -> None:
@@ -8,9 +10,9 @@ def create_data_dir() -> None:
     if not parent.exists():
         try:
             parent.mkdir()
-            print(f'Папка [{parent}] успешна создана')
+            logger.info(f'Папка [{parent}] успешна создана')
         except Exception:
-            print(f'Ошибка создании папки [{parent}]')
+            logger.error(f'Ошибка создании папки [{parent}]')
         return
     
-    print(f'Папка [{parent}] уже существует')
+    logger.info(f'Папка [{parent}] уже существует')
