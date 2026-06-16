@@ -3,7 +3,6 @@ import asyncio
 
 from app.core.process_data import process_data
 from app.core.logging import metrics
-from app.dependens.metrics import MetricsDep
 
 from app.core.file_writer import async_file_writer
 
@@ -14,7 +13,7 @@ ws_router = APIRouter(prefix='/ws', tags=['WebSocket'])
 
 
 @ws_router.websocket('/source')
-async def source(websocket: WebSocket, metrics: MetricsDep) -> None:
+async def source(websocket: WebSocket) -> None:
     retry = 0
     max_retry = 5
     
