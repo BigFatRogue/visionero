@@ -7,7 +7,15 @@
     <title>View Data</title>
 </head>
 <body>
-    <span>Хелёооу</span>
+    <main class="content">
+        <div class="container">
+            <div class="viewer">
+                <button class="viewer__btn-update">Обновить</button>
+                <div class="viewer__text"></div>
+            </div>
+        </div>
+    </main>
+
     <script src="{{ url_for('static', path='js/script.js') }}" type="module"></script>
 </body>
 </html>

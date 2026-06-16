@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-size: 18px;
+}
+
+.container {
+    max-width: 600px;
+    padding-inline: 20px;
+    margin-inline: auto;
+}
+
+.viewer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.viewer__text {
+    border: 1px solid black;
+    height: 200px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+}

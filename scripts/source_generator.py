@@ -81,8 +81,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # print(generator_message(1, 0.1))
-    # python scripts/source_generator.py --count 10000 --rps 500 --sensors 5 --bad-rate 0.01
+
 
     
     
