@@ -4,7 +4,7 @@ from pathlib import Path
 
 def create_data_dir() -> None:
     filepath = Path(settings.DATA_FILEPATH)
-    parent = Path(__file__).parent / filepath.parent
+    parent = filepath.parent
     if not parent.exists():
         try:
             parent.mkdir()
